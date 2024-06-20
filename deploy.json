@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the application."
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The Azure region where the resources will be deployed."
+            }
+        },
+        "sku": {
+            "type": "string",
+            "metadata": {
+                "description": "The SKU of the resources."
+            }
+        }
+    },
+    "variables": {
+        "appServicePlanName": "[concat(parameters('appName'), '-plan')]",
+        "appServiceName": "[concat(parameters('appName'), '-app')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('appServicePlanName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('sku')]",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 1
+            },
+            "properties": {
+                "name": "[variables('appServicePlanName')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2021-02-01",
+            "name": "[variables('appServiceName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            ],
+            "properties": {
+                "name": "[variables('appServiceName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            }
+        }
+    ],
+    "outputs": {
+        "appServiceEndpoint": {
+            "type": "string",
+            "value": "[reference(variables('appServiceName')).defaultHostName]"
+        }
+    }
+}
