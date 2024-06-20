@@ -18,7 +18,7 @@ namespace CRUD_application_2.Controllers
       // GET: User/Details/5
         public ActionResult Details(int id)
         {
-            // Implement the details method here
+            // Implement the details method here.
             var user = userlist.FirstOrDefault(u => u.Id == id);
             if (user == null)
             {
